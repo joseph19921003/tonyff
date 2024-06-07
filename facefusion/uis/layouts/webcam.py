@@ -1,6 +1,6 @@
-import multiprocessing
 import gradio
 
+import facefusion.globals
 from facefusion.uis.components import about, frame_processors, frame_processors_options, execution, execution_thread_count, webcam_options, source, webcam
 
 
@@ -45,5 +45,4 @@ def listen() -> None:
 
 
 def run(ui : gradio.Blocks) -> None:
-	concurrency_count = min(2, multiprocessing.cpu_count())
-	ui.queue(concurrency_count = concurrency_count).launch(show_api = False, quiet = True,share = True)
+	ui.launch(show_api = False, inbrowser = facefusion.globals.open_browser)

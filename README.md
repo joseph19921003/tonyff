@@ -1,2 +1,13 @@
-# tonyff
-备份自用，就是为了修改facefusion的几行代码，适合在Colab上使用！ 
+---
+title: Facefusion
+emoji: 😻
+colorFrom: yellow
+colorTo: yellow
+sdk: gradio
+sdk_version: 4.31.5
+app_file: app.py
+pinned: false
+license: apache-2.0
+---
+
+Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference

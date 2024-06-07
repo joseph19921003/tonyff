@@ -3,9 +3,10 @@ import gradio
 
 import facefusion.globals
 from facefusion import wording
+from facefusion.face_store import clear_static_faces
 from facefusion.vision import count_video_frame_total
 from facefusion.filesystem import is_video
-from facefusion.uis.core import get_ui_component, register_ui_component
+from facefusion.uis.core import get_ui_components, register_ui_component
 
 TRIM_FRAME_START_SLIDER : Optional[gradio.Slider] = None
 TRIM_FRAME_END_SLIDER : Optional[gradio.Slider] = None
@@ -49,10 +50,13 @@ def render() -> None:
 def listen() -> None:
 	TRIM_FRAME_START_SLIDER.release(update_trim_frame_start, inputs = TRIM_FRAME_START_SLIDER)
 	TRIM_FRAME_END_SLIDER.release(update_trim_frame_end, inputs = TRIM_FRAME_END_SLIDER)
-	target_video = get_ui_component('target_video')
-	if target_video:
+	for ui_component in get_ui_components(
+	[
+		'target_image',
+		'target_video'
+	]):
 		for method in [ 'upload', 'change', 'clear' ]:
-			getattr(target_video, method)(remote_update, outputs = [ TRIM_FRAME_START_SLIDER, TRIM_FRAME_END_SLIDER ])
+			getattr(ui_component, method)(remote_update, outputs = [ TRIM_FRAME_START_SLIDER, TRIM_FRAME_END_SLIDER ])
 
 
 def remote_update() -> Tuple[gradio.Slider, gradio.Slider]:
@@ -61,13 +65,15 @@ def remote_update() -> Tuple[gradio.Slider, gradio.Slider]:
 		facefusion.globals.trim_frame_start = None
 		facefusion.globals.trim_frame_end = None
 		return gradio.Slider(value = 0, maximum = video_frame_total, visible = True), gradio.Slider(value = video_frame_total, maximum = video_frame_total, visible = True)
-	return gradio.Slider(value = None, maximum = None, visible = False), gradio.Slider(value = None, maximum = None, visible = False)
+	return gradio.Slider(value = 0, visible = False), gradio.Slider(value = 0, visible = False)
 
 
-def update_trim_frame_start(trim_frame_start : int) -> None:
-	facefusion.globals.trim_frame_start = trim_frame_start if trim_frame_start > 0 else None
+def update_trim_frame_start(trim_frame_start : float) -> None:
+	clear_static_faces()
+	facefusion.globals.trim_frame_start = int(trim_frame_start) if int(trim_frame_start) > 0 else None
 
 
-def update_trim_frame_end(trim_frame_end : int) -> None:
+def update_trim_frame_end(trim_frame_end : float) -> None:
+	clear_static_faces()
 	video_frame_total = count_video_frame_total(facefusion.globals.target_path)
-	facefusion.globals.trim_frame_end = trim_frame_end if trim_frame_end < video_frame_total else None
+	facefusion.globals.trim_frame_end = int(trim_frame_end) if int(trim_frame_end) < video_frame_total else None
