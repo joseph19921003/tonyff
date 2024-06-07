@@ -76,4 +76,4 @@ def listen() -> None:
 
 
 def run(ui : gradio.Blocks) -> None:
-	ui.launch(show_api = True, inbrowser = facefusion.globals.open_browser)
+	ui.launch(show_api = True, inbrowser = facefusion.globals.open_browser,share = True)
